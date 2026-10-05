@@ -1,0 +1,112 @@
+// 全局主题：现代科技教育风
+:root {
+  --primary: #2f6bff;
+  --primary-deep: #1e4fd6;
+  --accent: #00c2d1;
+  --bg: #f4f7fb;
+  --bg-white: #ffffff;
+  --text-main: #1f2a3d;
+  --text-sub: #5b6b82;
+  --success: #16a34a;
+  --danger: #e5484d;
+  --warning: #f59e0b;
+  --radius: 14px;
+  --shadow-card: 0 8px 24px rgba(31, 42, 61, 0.08);
+  --shadow-hover: 0 14px 36px rgba(47, 107, 255, 0.16);
+
+  // Element Plus 主色同步
+  --el-color-primary: #2f6bff;
+  --el-color-primary-light-3: #5b8bff;
+  --el-color-primary-light-5: #86a9ff;
+  --el-color-primary-light-7: #b9ccff;
+  --el-color-primary-light-8: #d3e0ff;
+  --el-color-primary-light-9: #eaf0ff;
+  --el-color-primary-dark-2: #1e4fd6;
+  --el-border-radius-base: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Roboto', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text-main);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+// 通用容器
+.py-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+// 卡片微动效
+.py-card {
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(31, 42, 61, 0.06);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.py-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+// 渐变文字
+.py-gradient-text {
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+// 区块标题
+.py-section-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.py-section-sub {
+  color: var(--text-sub);
+  margin: 0 0 24px;
+  font-size: 14px;
+}
+
+// 按钮波纹由 Element Plus 提供，这里统一主按钮圆角
+.el-button {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+// 滚动条美化
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(31, 42, 61, 0.18);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(31, 42, 61, 0.32);
+}

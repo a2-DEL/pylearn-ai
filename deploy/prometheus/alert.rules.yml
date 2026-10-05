@@ -1,0 +1,27 @@
+groups:
+  - name: pylearn-alerts
+    rules:
+      # 后端 5xx 比率超过 5%（最近 5 分钟）触发告警
+      - alert: HighErrorRate
+        expr: |
+          (
+            rate(pylearn_errors_total[5m])
+            /
+            (rate(pylearn_requests_total[5m]) > 0)
+          ) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PyLearn 后端 5xx 错误率过高"
+          description: "近 5 分钟 5xx 比率约 {{ printf \"%.1f\" $value }}%，超过 5% 阈值。"
+
+      # 平均响应耗时超过 1.5s（最近 5 分钟）触发告警
+      - alert: HighLatency
+        expr: rate(pylearn_latency_avg_ms[5m]) > 1500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PyLearn 后端响应延迟偏高"
+          description: "近 5 分钟平均响应耗时约 {{ printf \"%.0f\" $value }}ms，超过 1500ms 阈值。"

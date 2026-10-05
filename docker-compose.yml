@@ -1,0 +1,109 @@
+# PyLearn AI 一键部署
+# 默认：backend + frontend + redis（内存限流回退需 REDIS_URL）
+#   docker compose up -d
+# 启用 PostgreSQL：   docker compose --profile pg up -d
+# 启用监控栈：        docker compose --profile monitor up -d
+# 全部：              docker compose --profile pg --profile monitor up -d
+
+services:
+  backend:
+    build: ./backend
+    container_name: pylearn-backend
+    env_file: .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+        required: false
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: pylearn-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: pylearn-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ---- 可选：PostgreSQL（--profile pg） ----
+  postgres:
+    image: postgres:16-alpine
+    container_name: pylearn-postgres
+    profiles: ["pg"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pylearn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pylearn}
+      POSTGRES_DB: ${POSTGRES_DB:-pylearn}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pylearn}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ---- 可选：监控栈（--profile monitor） ----
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pylearn-prometheus
+    profiles: ["monitor"]
+    volumes:
+      - ./deploy/prometheus:/etc/prometheus:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pylearn-grafana
+    profiles: ["monitor"]
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  redisdata:
+  pgdata:
+  grafanadata:

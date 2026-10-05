@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+pylearn.db
+.env
+
+# Frontend
+node_modules/
+dist/
+*.local
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Internal tooling
+.codebuddy/
