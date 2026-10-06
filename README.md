@@ -13,6 +13,8 @@
 
 </div>
 
+![PyLearn AI 首页](./docs/screenshots/home.png)
+
 ---
 
 ## 为什么需要这个项目
